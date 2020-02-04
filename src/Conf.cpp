@@ -245,6 +245,8 @@ void Conf::setAuthority(const ConfParser::Node* node)
                 }
             } else if (strcasecmp(k.c_str(), "KeyPrefix") == 0) {
                 setKeyPrefix(c.keyPrefix, v);
+            } else if (strcasecmp(k.c_str(), "IPWhiteList") == 0) {
+                setKeyPrefix(c.IPWhiteList, v);
             } else if (strcasecmp(k.c_str(), "ReadKeyPrefix") == 0) {
                 setKeyPrefix(c.readKeyPrefix, v);
             } else if (strcasecmp(k.c_str(), "WriteKeyPrefix") == 0) {

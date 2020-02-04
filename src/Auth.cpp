@@ -21,13 +21,17 @@ Auth::Auth(const AuthConf& conf):
     mPassword(conf.password.c_str(), conf.password.size()),
     mMode(conf.mode),
     mReadKeyPrefix(nullptr),
-    mWriteKeyPrefix(nullptr)
+    mWriteKeyPrefix(nullptr),
+    mIPWhiteList(nullptr)
 {
     if (!conf.readKeyPrefix.empty()) {
         mReadKeyPrefix = new KeyPrefixSet(conf.readKeyPrefix.begin(), conf.readKeyPrefix.end());
     }
     if (!conf.writeKeyPrefix.empty()) {
         mWriteKeyPrefix = new KeyPrefixSet(conf.writeKeyPrefix.begin(), conf.writeKeyPrefix.end());
+    }
+    if (!conf.IPWhiteList.empty()) {
+        mIPWhiteList = new KeyPrefixSet(conf.IPWhiteList.begin(), conf.IPWhiteList.end());
     }
     if ((!mReadKeyPrefix || !mWriteKeyPrefix) && !conf.keyPrefix.empty()) {
         auto kp = new KeyPrefixSet(conf.keyPrefix.begin(), conf.keyPrefix.end());
@@ -48,6 +52,25 @@ Auth::~Auth()
     if (mWriteKeyPrefix && mWriteKeyPrefix != mReadKeyPrefix) {
         delete mWriteKeyPrefix;
     }
+}
+
+bool Auth::IPAllowed(const String& peer) const
+{
+    if (!mIPWhiteList) {
+        return true; // ip white list not set, allow all ip
+    }
+    char ip[64];
+    const char *p = (const char *)peer;
+    int i;
+    for (i = 0; i < 63; i++) {
+        if (p[i] == ':' || p[i] == '\0') {
+            break;
+        }
+        ip[i] = p[i];
+    }
+    ip[i] = '\0';
+    auto it = mIPWhiteList->find(ip);
+    return it != mIPWhiteList->end();
 }
 
 bool Auth::permission(Request* req, const String& key) const

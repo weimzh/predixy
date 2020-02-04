@@ -22,6 +22,7 @@ public:
     {
         return mPassword;
     }
+    bool IPAllowed(const String& peer) const;
     bool permission(Request* req, const String& key) const;
 private:
     String mPassword;
@@ -29,6 +30,7 @@ private:
     typedef std::set<String> KeyPrefixSet;
     KeyPrefixSet* mReadKeyPrefix;
     KeyPrefixSet* mWriteKeyPrefix;
+    KeyPrefixSet* mIPWhiteList;
 };
 
 class Authority

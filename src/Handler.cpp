@@ -1481,8 +1481,12 @@ bool Handler::permission(Request* req, const String& key, Response::GenericCode&
         if (!m->hasAuth()) {
             code = Response::NoPasswordSet;
         } else if (auto auth = m->get(req->isInline() ? pw : key)) {
-            c->setAuth(auth);
-            code = Response::Ok;
+            if (!auth->IPAllowed(c->peer())) {
+                code = Response::InvalidPassword;
+            } else {
+                c->setAuth(auth);
+                code = Response::Ok;
+            }
         } else {
             logNotice("h %d c %s %d auth '%.*s' invalid",
                     id(), c->peer(), c->fd(), key.length(), key.data());

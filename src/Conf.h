@@ -29,6 +29,7 @@ struct AuthConf
     std::vector<std::string> keyPrefix;
     std::vector<std::string> readKeyPrefix;
     std::vector<std::string> writeKeyPrefix;
+    std::vector<std::string> IPWhiteList;
 };
 
 struct ServerConf
