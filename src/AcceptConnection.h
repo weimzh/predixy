@@ -15,6 +15,7 @@
 #include "RequestParser.h"
 #include "Request.h"
 #include "Response.h"
+#include "Auth.h"
 
 class AcceptConnection :
     public AcceptSocket,
@@ -67,6 +68,9 @@ public:
     }
     void setAuth(const Auth* auth)
     {
+        if (mAuth) {
+            ((Auth*)mAuth)->unref();
+        }
         mAuth = auth;
     }
     bool isBlockRequest() const

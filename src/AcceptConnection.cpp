@@ -22,6 +22,9 @@ AcceptConnection::AcceptConnection(int fd, sockaddr* addr, socklen_t len):
 AcceptConnection::~AcceptConnection()
 {
     close();
+    if (mAuth) {
+        ((Auth*)mAuth)->unref();
+    }
 }
 
 void AcceptConnection::close()

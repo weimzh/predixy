@@ -89,9 +89,11 @@ bool Proxy::init(int argc, char* argv[])
         Logger::gInst->setLogSample(lvl, mConf->logSample(lvl));
     }
     Logger::gInst->start();
+    mAuthority.lock();
     for (auto& ac : mConf->authConfs()) {
         mAuthority.add(ac);
     }
+    mAuthority.unlock();
     if (!mConf->localDC().empty()) {
         mDataCenter = new DataCenter();
         mDataCenter->init(mConf);

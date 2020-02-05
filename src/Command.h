@@ -193,6 +193,8 @@ public:
         Unsubscribe,
         SubMsg,
 
+        ReloadAuth,
+
         MaxCommands,
         MaxCustomCommands = 16,
         AvailableCommands = MaxCommands + MaxCustomCommands,

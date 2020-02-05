@@ -31,6 +31,7 @@ namespace Const
     static const int MaxIOVecLen = IOV_MAX;
     static const int MaxCmdLen = 32;
     static const int MaxKeyLen = 512;
+    static const int AuthAllocCacheSize = 16;
     static const int BufferAllocCacheSize = 64;
     static const int RequestAllocCacheSize = 128;
     static const int ResponseAllocCacheSize = 128;

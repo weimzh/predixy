@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <sys/resource.h>
 #include <iostream>
+#include <limits.h>
 #include "Alloc.h"
 #include "Handler.h"
 #include "Proxy.h"
@@ -672,6 +673,30 @@ bool Handler::preHandleRequest(Request* req, const String& key)
             } else {
                 directResponse(req, Response::NoServerConnection);
             }
+            return true;
+        }
+        break;
+    case Command::ReloadAuth:
+        {
+            auto conf = mProxy->conf();
+            auto auth = (Authority*)mProxy->authority();
+            char path[PATH_MAX];
+            const char *p = key.data();
+            char *pDst = path;
+            while (pDst < path + sizeof(path) - 1 && *p && *p != '\r' && *p != '\n') {
+                *pDst++ = *p++;
+            }
+            *pDst = '\0';
+            if (!conf->reloadAuth(path)) {
+                directResponse(req, Response::DeliverRequestFail);
+                return true;
+            }
+            auth->lock();
+            for (auto& ac : conf->authConfs()) {
+                auth->add(ac);
+            }
+            auth->unlock();
+            directResponse(req, Response::Ok);
             return true;
         }
         break;
@@ -1420,6 +1445,14 @@ void Handler::innerResponse(ConnectConnection* s, Request* req, Response* res)
                     id(), s->peer(), s->fd(), s->db());
         }
         break;
+    case Command::ReloadAuth:
+        if (!res->isOk()) {
+            s->setStatus(ConnectConnection::LogicError);
+            addPostEvent(s, Multiplexor::ErrorEvent);
+            logWarn("h %d s %s %d reload auth fail",
+                    id(), s->peer(), s->fd(), s->db());
+        }
+        break;
     default:
         break;
     }
@@ -1483,6 +1516,7 @@ bool Handler::permission(Request* req, const String& key, Response::GenericCode&
         } else if (auto auth = m->get(req->isInline() ? pw : key)) {
             if (!auth->IPAllowed(c->peer())) {
                 code = Response::InvalidPassword;
+                auth->unref();
             } else {
                 c->setAuth(auth);
                 code = Response::Ok;

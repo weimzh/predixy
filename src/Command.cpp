@@ -171,7 +171,8 @@ Command Command::CmdPool[AvailableCommands] = {
     {Punsubscribe,      "punsubscribe",     1,  MaxArgs,   Write|SMultiKey},
     {Subscribe,         "subscribe",        2,  MaxArgs,   Write|SMultiKey|Private},
     {Unsubscribe,       "unsubscribe",      1,  MaxArgs,   Write|SMultiKey},
-    {SubMsg,            "\000SubMsg",       0,  0,         Admin}
+    {SubMsg,            "\000SubMsg",       0,  0,         Admin},
+    {ReloadAuth,        "reloadauth",       2,  2,         Admin}
 };
 
 int Command::Sentinel = Command::MaxCommands;

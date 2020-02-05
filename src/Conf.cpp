@@ -121,6 +121,26 @@ bool Conf::init(int argc, char* argv[])
     return true;
 }
 
+bool Conf::reloadAuth(const char *authPath)
+{
+    try {
+        ConfParser p;
+        ConfParser::Node* n = p.load(authPath);
+        mAuthConfs.clear();
+        for (auto pn = n; pn; pn = pn->next) {
+            if (strcasecmp(pn->key.c_str(), "Authority") == 0) {
+                try {
+                    setAuthority(pn);
+                } catch (InvalidValue ex) {
+                }
+            }
+        }
+        return true;
+    } catch (ConfParser::OpenFileFail ex) {
+        return false;
+    }
+}
+
 void Conf::setGlobal(const ConfParser::Node* node)
 {
     const ConfParser::Node* authority = nullptr;

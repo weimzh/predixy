@@ -12,7 +12,7 @@ endif
 
 EV ?= auto
 
-LDLIBCPP = -static-libstdc++
+LDLIBCPP =
 
 ifeq ($(EV), auto)
 	plt = $(shell uname)

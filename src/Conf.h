@@ -118,6 +118,8 @@ public:
     Conf();
     ~Conf();
     bool init(int argc, char* argv[]);
+    bool reloadAuth(const char *authPath);
+
     const char* name() const
     {
         return mName.c_str();

@@ -104,29 +104,40 @@ Auth Authority::AuthDenyAll(0);
 Authority::Authority():
     mDefault(&AuthAllowAll)
 {
+    if (mDefault->count() == 0)
+    {
+        mDefault->ref();
+    }
+    pthread_rwlock_init(&mLock, nullptr);
 }
 
 Authority::~Authority()
 {
     for (auto& i : mAuthMap) {
-        delete i.second;
+        i.second->unref();
     }
     mAuthMap.clear();
+    pthread_rwlock_destroy(&mLock);
 }
 
 void Authority::add(const AuthConf& ac)
 {
-    Auth* a = new Auth(ac);
+    Auth* a = Auth::Allocator::create(ac);
     auto it = mAuthMap.find(a->password());
     if (it != mAuthMap.end()) {
         Auth* p = it->second;
         mAuthMap.erase(it);
-        delete p;
+        p->unref();
     }
+    a->ref();
     mAuthMap[a->password()] = a;
     if (a->password().empty()) {
         mDefault = a;
     } else if (mDefault == &AuthAllowAll) {
         mDefault = &AuthDenyAll;
+        if (mDefault->count() == 0)
+        {
+            mDefault->ref();
+        }
     }
 }
